@@ -1,19 +1,52 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate();
+
   // Store the values entered into the login form.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Handle form submission for now.
-  const handleSubmit = (event) => {
+  // Handle form submission.
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    console.log("Login form submitted:", {
-      email,
-      password,
-    });
+    setError("");
+
+    try {
+      setLoading(true);
+
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      // Temporarily store the logged-in user.
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Go back to the home page after successful login.
+      navigate("/");
+    } catch (error) {
+      console.error("Login failed:", error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -29,6 +62,12 @@ function Login() {
         {/* Login card */}
         <div className="rounded-2xl bg-white p-6 shadow-md md:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
+
             {/* Email */}
             <div>
               <label
@@ -72,9 +111,10 @@ function Login() {
             {/* Login button */}
             <button
               type="submit"
-              className="w-full rounded-lg bg-blue-600 px-4 py-3 font-medium text-white transition hover:bg-blue-700"
+              disabled={loading}
+              className="w-full rounded-lg bg-blue-600 px-4 py-3 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Sign In
+              {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
 

@@ -6,20 +6,17 @@ const prisma = require("./prisma");
 const hotelRoutes = require("./routes/hotelRoutes");
 const roomRoutes = require("./routes/roomRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// Hotel-related API routes
 app.use("/api/hotels", hotelRoutes);
-
-// Room-related API routes
 app.use("/api/rooms", roomRoutes);
-
-// Booking-related API routes
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.json({

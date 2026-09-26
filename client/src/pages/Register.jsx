@@ -1,27 +1,64 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 function Register() {
+  const navigate = useNavigate();
+
   // Store the values entered into the registration form.
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // Handle form submission for now.
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
+    setError("");
+    setSuccess("");
+
     if (password !== confirmPassword) {
-      console.log("Passwords do not match");
+      setError("Passwords do not match.");
       return;
     }
 
-    console.log("Registration form submitted:", {
-      name,
-      email,
-      password,
-    });
+    try {
+      setLoading(true);
+
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
+
+      setSuccess("Account created successfully!");
+
+      // Give the user a moment to see the success message.
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
+    } catch (error) {
+      console.error("Registration failed:", error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,6 +78,18 @@ function Register() {
         {/* Registration card */}
         <div className="rounded-2xl bg-white p-6 shadow-md md:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700">
+                {success}
+              </div>
+            )}
+
             {/* Name */}
             <div>
               <label
@@ -128,7 +177,7 @@ function Register() {
               type="submit"
               className="w-full rounded-lg bg-blue-600 px-4 py-3 font-medium text-white transition hover:bg-blue-700"
             >
-              Create Account
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 
