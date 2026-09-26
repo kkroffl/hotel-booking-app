@@ -1,9 +1,61 @@
+import { useEffect, useState } from "react";
 import SearchBar from "../components/SearchBar";
 import HotelCard from "../components/HotelCard";
 import FeatureCard from "../components/FeatureCard";
-import hotels from "../data/hotels";
 
 function Home() {
+  // Stores hotel data received from our backend API
+  const [hotels, setHotels] = useState([]);
+
+  // Shows a loading message while the API request is running
+  const [loading, setLoading] = useState(true);
+
+  // Stores an error message if the API request fails
+  const [error, setError] = useState("");
+
+  // Fetch hotel data from our Express backend
+  useEffect(() => {
+    const fetchHotels = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/hotels");
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch hotels");
+        }
+
+        const data = await response.json();
+
+        // Store the hotels returned by PostgreSQL
+        setHotels(data.hotels);
+      } catch (error) {
+        console.error("Failed to load hotels:", error);
+        setError("Unable to load hotels");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHotels();
+  }, []);
+
+  // Show this while waiting for the backend response
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-lg text-gray-600">Loading hotels...</p>
+      </div>
+    );
+  }
+
+  // Show this if the API request fails
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-lg text-red-500">{error}</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       {/* Hero section */}
@@ -37,8 +89,8 @@ function Home() {
           </div>
 
           {/* 
-            We loop through our temporary hotel data.
-            For every hotel, React creates one HotelCard.
+            We now loop through hotel data received
+            from PostgreSQL through our backend API.
           */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {hotels.map((hotel) => (

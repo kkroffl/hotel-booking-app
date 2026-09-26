@@ -17,14 +17,14 @@ function HotelCard({ hotel }) {
         {/* Hotel location */}
         <p className="mt-1 text-sm text-gray-500">{hotel.location}</p>
 
-        {/* Rating and price */}
+        {/* Rating and starting price */}
         <div className="mt-4 flex items-center justify-between">
           <span className="rounded-md bg-green-100 px-2 py-1 text-sm font-medium text-green-700">
             ★ {hotel.rating}
           </span>
 
           <p className="text-lg font-bold text-gray-900">
-            ₹{hotel.price}
+            ₹{hotel.startingPrice}
             <span className="text-sm font-normal text-gray-500">/night</span>
           </p>
         </div>

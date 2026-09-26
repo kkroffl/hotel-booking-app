@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import HotelCard from "../components/HotelCard";
-import hotels from "../data/hotels";
 
 function Hotels() {
   // Read the search information from the URL.
@@ -13,10 +12,44 @@ function Hotels() {
   const checkOut = searchParams.get("checkOut");
   const guests = searchParams.get("guests");
 
+  // Store hotels received from the backend API.
+  const [hotels, setHotels] = useState([]);
+
+  // Store loading and error states.
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   // These states store the filters selected by the user.
   const [maxPrice, setMaxPrice] = useState("");
   const [minRating, setMinRating] = useState("");
   const [sortBy, setSortBy] = useState("");
+
+  // Fetch hotels from our Express backend.
+  useEffect(() => {
+    const fetchHotels = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await fetch("http://localhost:5000/api/hotels");
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch hotels");
+        }
+
+        const data = await response.json();
+
+        setHotels(data.hotels || []);
+      } catch (error) {
+        console.error("Failed to fetch hotels:", error);
+        setError("Unable to load hotels. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHotels();
+  }, []);
 
   // First filter the hotels by location.
   let filteredHotels = location
@@ -25,10 +58,10 @@ function Hotels() {
       )
     : hotels;
 
-  // Filter hotels based on the maximum price selected by the user.
+  // Filter hotels based on the maximum starting price selected by the user.
   if (maxPrice) {
     filteredHotels = filteredHotels.filter(
-      (hotel) => hotel.price <= Number(maxPrice),
+      (hotel) => hotel.startingPrice <= Number(maxPrice),
     );
   }
 
@@ -41,11 +74,15 @@ function Hotels() {
 
   // Create a copy before sorting so we don't directly modify our original data.
   if (sortBy === "price-low") {
-    filteredHotels = [...filteredHotels].sort((a, b) => a.price - b.price);
+    filteredHotels = [...filteredHotels].sort(
+      (a, b) => a.startingPrice - b.startingPrice,
+    );
   }
 
   if (sortBy === "price-high") {
-    filteredHotels = [...filteredHotels].sort((a, b) => b.price - a.price);
+    filteredHotels = [...filteredHotels].sort(
+      (a, b) => b.startingPrice - a.startingPrice,
+    );
   }
 
   if (sortBy === "rating") {
@@ -58,6 +95,34 @@ function Hotels() {
     setMinRating("");
     setSortBy("");
   };
+
+  // Show loading state while fetching hotels.
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 px-6 py-10">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-gray-600">Loading hotels...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if the API request fails.
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 px-6 py-10">
+        <div className="mx-auto max-w-7xl">
+          <div className="rounded-xl bg-white p-10 text-center shadow-sm">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Unable to load hotels
+            </h2>
+
+            <p className="mt-2 text-gray-600">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
