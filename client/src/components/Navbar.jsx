@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/user.png";
 
@@ -10,6 +10,20 @@ function Navbar() {
 
     return storedUser ? JSON.parse(storedUser) : null;
   });
+
+  useEffect(() => {
+    const handleAuthChange = () => {
+      const storedUser = localStorage.getItem("user");
+
+      setUser(storedUser ? JSON.parse(storedUser) : null);
+    };
+
+    window.addEventListener("authChanged", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("authChanged", handleAuthChange);
+    };
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("user");

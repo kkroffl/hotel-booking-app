@@ -174,7 +174,17 @@ function Bookings() {
                         : "bg-gray-100 text-gray-700"
                     }`}
                   >
-                    {booking.status}
+                    <span
+                      className={`rounded-full px-3 py-1 text-sm font-medium ${
+                        booking.status === "CONFIRMED"
+                          ? "bg-green-100 text-green-700"
+                          : booking.status === "COMPLETED"
+                            ? "bg-blue-100 text-blue-700"
+                            : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {booking.status}
+                    </span>
                   </span>
                 </div>
 

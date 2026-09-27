@@ -1,8 +1,24 @@
 const prisma = require("../prisma");
 
+const updateCompletedBookings = async () => {
+  await prisma.booking.updateMany({
+    where: {
+      status: "CONFIRMED",
+      checkOut: {
+        lt: new Date(),
+      },
+    },
+    data: {
+      status: "COMPLETED",
+    },
+  });
+};
+
 // Get all bookings from the database
 const getBookings = async (req, res) => {
   try {
+    await updateCompletedBookings();
+
     const bookings = await prisma.booking.findMany({
       // Include the user who made the booking
       include: {
@@ -159,6 +175,8 @@ const createBooking = async (req, res) => {
 // Get all bookings belonging to one specific user
 const getBookingsByUser = async (req, res) => {
   try {
+    await updateCompletedBookings();
+
     // Get the user ID from the URL
     const userId = Number(req.params.userId);
 
@@ -203,6 +221,13 @@ const cancelBooking = async (req, res) => {
   try {
     // Get the booking ID from the URL
     const bookingId = Number(req.params.id);
+
+    if (booking.status !== "CONFIRMED") {
+      return res.status(400).json({
+        status: "error",
+        message: "Only confirmed bookings can be cancelled",
+      });
+    }
 
     // Find the booking first
     const booking = await prisma.booking.findUnique({

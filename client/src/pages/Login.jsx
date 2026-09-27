@@ -39,6 +39,8 @@ function Login() {
       // Temporarily store the logged-in user.
       localStorage.setItem("user", JSON.stringify(data.user));
 
+      window.dispatchEvent(new Event("authChanged"));
+
       // Go back to the home page after successful login.
       navigate("/");
     } catch (error) {
