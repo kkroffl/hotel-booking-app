@@ -14,6 +14,15 @@ function HotelDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Store review states.
+  const [reviews, setReviews] = useState([]);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewError, setReviewError] = useState("");
+  const [reviewSuccess, setReviewSuccess] = useState("");
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [canReview, setCanReview] = useState(false);
+
   // Fetch the selected hotel from our backend.
   useEffect(() => {
     const fetchHotel = async () => {
@@ -39,7 +48,114 @@ function HotelDetails() {
     };
 
     fetchHotel();
+
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/reviews/hotel/${id}`,
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to fetch reviews");
+        }
+
+        setReviews(data.reviews);
+      } catch (error) {
+        console.error("Failed to fetch reviews:", error);
+      }
+    };
+
+    fetchReviews();
+
+    const checkReviewEligibility = async () => {
+      const storedUser = localStorage.getItem("user");
+
+      if (!storedUser) {
+        return;
+      }
+
+      const user = JSON.parse(storedUser);
+
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/bookings/user/${user.id}`,
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          return;
+        }
+
+        const completedBooking = data.bookings?.some(
+          (booking) =>
+            booking.status === "CONFIRMED" &&
+            booking.room?.hotelId === Number(id) &&
+            new Date(booking.checkOut) < new Date(),
+        );
+
+        setCanReview(Boolean(completedBooking));
+      } catch (error) {
+        console.error("Failed to check review eligibility:", error);
+      }
+    };
+
+    checkReviewEligibility();
   }, [id]);
+
+  const handleSubmitReview = async (event) => {
+    event.preventDefault();
+
+    const storedUser = localStorage.getItem("user");
+    const user = storedUser ? JSON.parse(storedUser) : null;
+
+    if (!user) {
+      setReviewError("Please login to write a review.");
+      return;
+    }
+
+    if (!reviewComment.trim()) {
+      setReviewError("Please enter a comment.");
+      return;
+    }
+
+    try {
+      setReviewLoading(true);
+      setReviewError("");
+      setReviewSuccess("");
+
+      const response = await fetch("http://localhost:5000/api/reviews", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          hotelId: hotel.id,
+          rating: Number(reviewRating),
+          comment: reviewComment,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to submit review");
+      }
+
+      setReviews((currentReviews) => [data.review, ...currentReviews]);
+      setReviewComment("");
+      setReviewRating(5);
+      setReviewSuccess("Review submitted successfully.");
+    } catch (error) {
+      console.error("Failed to submit review:", error);
+      setReviewError(error.message);
+    } finally {
+      setReviewLoading(false);
+    }
+  };
 
   // Loading state.
   if (loading) {
@@ -218,6 +334,107 @@ function HotelDetails() {
             </div>
           )}
         </section>
+      </div>
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold text-gray-900">Guest Reviews</h2>
+
+        {reviews.length === 0 ? (
+          <p className="mt-4 text-gray-600">
+            No reviews yet. Be the first to review this hotel.
+          </p>
+        ) : (
+          <div className="mt-6 space-y-4">
+            {reviews.map((review) => (
+              <div
+                key={review.id}
+                className="rounded-xl border border-gray-200 bg-white p-5"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="font-semibold text-gray-900">
+                    {review.user?.name}
+                  </p>
+
+                  <p className="text-sm text-gray-500">
+                    {new Date(review.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+
+                <p className="mt-2 text-yellow-500">
+                  {"★".repeat(review.rating)}
+                  {"☆".repeat(5 - review.rating)}
+                </p>
+
+                <p className="mt-3 text-gray-700">{review.comment}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {canReview && (
+          <div className="mt-8 rounded-xl bg-white p-6 shadow-sm">
+            <h3 className="text-xl font-semibold text-gray-900">
+              Write a Review
+            </h3>
+
+            <form onSubmit={handleSubmitReview} className="mt-5 space-y-5">
+              <div>
+                <label
+                  htmlFor="reviewRating"
+                  className="mb-2 block text-sm font-medium text-gray-700"
+                >
+                  Rating
+                </label>
+
+                <select
+                  id="reviewRating"
+                  value={reviewRating}
+                  onChange={(event) => setReviewRating(event.target.value)}
+                  className="rounded-lg border border-gray-300 px-4 py-3"
+                >
+                  <option value="5">5 - Excellent</option>
+                  <option value="4">4 - Very Good</option>
+                  <option value="3">3 - Good</option>
+                  <option value="2">2 - Fair</option>
+                  <option value="1">1 - Poor</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="reviewComment"
+                  className="mb-2 block text-sm font-medium text-gray-700"
+                >
+                  Comment
+                </label>
+
+                <textarea
+                  id="reviewComment"
+                  value={reviewComment}
+                  onChange={(event) => setReviewComment(event.target.value)}
+                  rows="4"
+                  placeholder="Share your experience..."
+                  className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+
+              {reviewError && (
+                <p className="text-sm text-red-600">{reviewError}</p>
+              )}
+
+              {reviewSuccess && (
+                <p className="text-sm text-green-600">{reviewSuccess}</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={reviewLoading}
+                className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {reviewLoading ? "Submitting..." : "Submit Review"}
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );
