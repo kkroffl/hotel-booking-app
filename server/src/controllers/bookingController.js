@@ -92,30 +92,23 @@ const createBooking = async (req, res) => {
 
     // Check whether this room already has a booking
     // that overlaps with the requested dates.
-    const overlappingBooking = await prisma.booking.findFirst({
+    const overlappingBookings = await prisma.booking.count({
       where: {
         roomId: Number(roomId),
-
-        // An existing booking overlaps when:
-        // existing check-in  < requested check-out
-        // AND
-        // existing check-out > requested check-in
         checkIn: {
           lt: endDate,
         },
         checkOut: {
           gt: startDate,
         },
-
-        // Only confirmed bookings should block the room
         status: "CONFIRMED",
       },
     });
 
-    if (overlappingBooking) {
+    if (overlappingBookings >= room.totalRooms) {
       return res.status(409).json({
         status: "error",
-        message: "Room is already booked for the selected dates",
+        message: "No rooms are available for the selected dates",
       });
     }
 

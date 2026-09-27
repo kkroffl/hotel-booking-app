@@ -69,15 +69,11 @@ const getHotelById = async (req, res) => {
   try {
     const hotelId = Number(req.params.id);
 
-    const hotel = await prisma.hotel.findUnique({
-      where: {
-        id: hotelId,
-      },
+    const { checkIn, checkOut } = req.query;
 
-      // Also fetch all rooms belonging to this hotel
-      include: {
-        rooms: true,
-      },
+    const hotel = await prisma.hotel.findUnique({
+      where: { id: hotelId },
+      include: { rooms: true },
     });
 
     if (!hotel) {
@@ -87,9 +83,49 @@ const getHotelById = async (req, res) => {
       });
     }
 
+    const rooms = await Promise.all(
+      hotel.rooms.map(async (room) => {
+        let availableRooms = room.totalRooms;
+
+        if (checkIn && checkOut) {
+          const startDate = new Date(checkIn);
+          const endDate = new Date(checkOut);
+
+          if (
+            !Number.isNaN(startDate.getTime()) &&
+            !Number.isNaN(endDate.getTime()) &&
+            startDate < endDate
+          ) {
+            const overlappingBookings = await prisma.booking.count({
+              where: {
+                roomId: room.id,
+                status: "CONFIRMED",
+                checkIn: {
+                  lt: endDate,
+                },
+                checkOut: {
+                  gt: startDate,
+                },
+              },
+            });
+
+            availableRooms = Math.max(room.totalRooms - overlappingBookings, 0);
+          }
+        }
+
+        return {
+          ...room,
+          availableRooms,
+        };
+      }),
+    );
+
     res.json({
       status: "success",
-      hotel,
+      hotel: {
+        ...hotel,
+        rooms,
+      },
     });
   } catch (error) {
     console.error("Failed to fetch hotel:", error);

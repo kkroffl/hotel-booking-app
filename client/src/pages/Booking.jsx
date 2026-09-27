@@ -5,13 +5,17 @@ function Booking() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const room = location.state?.room;
-  const hotel = location.state?.hotel;
+  const {
+    room,
+    hotel,
+    checkIn: selectedCheckIn,
+    checkOut: selectedCheckOut,
+  } = location.state || {};
 
   const user = JSON.parse(localStorage.getItem("user"));
 
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
+  const [checkIn, setCheckIn] = useState(selectedCheckIn || "");
+  const [checkOut, setCheckOut] = useState(selectedCheckOut || "");
   const [guests, setGuests] = useState(1);
 
   const [error, setError] = useState("");

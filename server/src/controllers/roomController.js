@@ -28,24 +28,56 @@ const getRooms = async (req, res) => {
 // Get all rooms belonging to one specific hotel
 const getRoomsByHotel = async (req, res) => {
   try {
-    // Get the hotel ID from the URL
     const hotelId = Number(req.params.hotelId);
 
-    const rooms = await prisma.room.findMany({
-      where: {
-        hotelId: hotelId,
-      },
+    const { checkIn, checkOut } = req.query;
 
-      // Show cheaper rooms first
-      orderBy: {
-        price: "asc",
-      },
+    const rooms = await prisma.room.findMany({
+      where: { hotelId },
+      orderBy: { price: "asc" },
     });
+
+    const formattedRooms = await Promise.all(
+      rooms.map(async (room) => {
+        let availableRooms = room.totalRooms;
+
+        if (checkIn && checkOut) {
+          const startDate = new Date(checkIn);
+          const endDate = new Date(checkOut);
+
+          if (
+            !Number.isNaN(startDate.getTime()) &&
+            !Number.isNaN(endDate.getTime()) &&
+            startDate < endDate
+          ) {
+            const overlappingBookings = await prisma.booking.count({
+              where: {
+                roomId: room.id,
+                status: "CONFIRMED",
+                checkIn: {
+                  lt: endDate,
+                },
+                checkOut: {
+                  gt: startDate,
+                },
+              },
+            });
+
+            availableRooms = Math.max(room.totalRooms - overlappingBookings, 0);
+          }
+        }
+
+        return {
+          ...room,
+          availableRooms,
+        };
+      }),
+    );
 
     res.json({
       status: "success",
-      count: rooms.length,
-      rooms,
+      count: formattedRooms.length,
+      rooms: formattedRooms,
     });
   } catch (error) {
     console.error("Failed to fetch hotel rooms:", error);

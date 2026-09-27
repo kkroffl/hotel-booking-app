@@ -23,6 +23,10 @@ function HotelDetails() {
   const [reviewLoading, setReviewLoading] = useState(false);
   const [canReview, setCanReview] = useState(false);
 
+  // Store check in and out for room availability states.
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+
   // Fetch the selected hotel from our backend.
   useEffect(() => {
     const fetchHotel = async () => {
@@ -30,7 +34,12 @@ function HotelDetails() {
         setLoading(true);
         setError("");
 
-        const response = await fetch(`http://localhost:5000/api/hotels/${id}`);
+        const query =
+          checkIn && checkOut ? `?checkIn=${checkIn}&checkOut=${checkOut}` : "";
+
+        const response = await fetch(
+          `http://localhost:5000/api/hotels/${id}${query}`,
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch hotel");
@@ -103,7 +112,7 @@ function HotelDetails() {
     };
 
     checkReviewEligibility();
-  }, [id]);
+  }, [id, checkIn, checkOut]);
 
   const handleSubmitReview = async (event) => {
     event.preventDefault();
@@ -256,6 +265,41 @@ function HotelDetails() {
           </div>
         </div>
 
+        {/* Dynamic Changing of Room Availability */}
+        <div className="mb-8 rounded-xl border bg-gray-50 p-5">
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">
+            Select your dates
+          </h2>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Check-in
+              </label>
+
+              <input
+                type="date"
+                value={checkIn}
+                onChange={(event) => setCheckIn(event.target.value)}
+                className="w-full rounded-lg border px-4 py-3 outline-none focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Check-out
+              </label>
+
+              <input
+                type="date"
+                value={checkOut}
+                onChange={(event) => setCheckOut(event.target.value)}
+                className="w-full rounded-lg border px-4 py-3 outline-none focus:border-blue-500"
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Rooms */}
         <section className="mt-10">
           <div className="mb-6">
@@ -303,24 +347,32 @@ function HotelDetails() {
                         👤 Up to {room.capacity} guests
                       </span>
 
-                      <span className="rounded-md bg-gray-100 px-3 py-2">
-                        🏨 {room.totalRooms} rooms available
+                      <span className="rounded-md bg-blue-100 px-3 py-2">
+                        🏨 {room.availableRooms} rooms - dynamically changes
+                        based on availability
                       </span>
                     </div>
 
                     <button
                       type="button"
+                      disabled={room.availableRooms === 0}
                       onClick={() =>
                         navigate("/booking", {
                           state: {
                             room,
                             hotel,
+                            checkIn,
+                            checkOut,
                           },
                         })
                       }
-                      className="mt-6 w-full rounded-lg bg-blue-600 px-4 py-3 font-medium text-white transition hover:bg-blue-700"
+                      className={`mt-6 w-full rounded-lg px-4 py-3 font-medium text-white transition ${
+                        room.availableRooms === 0
+                          ? "cursor-not-allowed bg-gray-400"
+                          : "bg-blue-600 hover:bg-blue-700"
+                      }`}
                     >
-                      Book Now
+                      {room.availableRooms === 0 ? "Fully Booked" : "Book Now"}
                     </button>
                   </div>
                 </div>
