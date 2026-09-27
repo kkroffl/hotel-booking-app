@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function HotelDetails() {
   // Get the hotel ID from the URL.
   const { id } = useParams();
+
+  const navigate = useNavigate();
 
   // Store the hotel received from the backend.
   const [hotel, setHotel] = useState(null);
@@ -192,6 +194,14 @@ function HotelDetails() {
 
                     <button
                       type="button"
+                      onClick={() =>
+                        navigate("/booking", {
+                          state: {
+                            room,
+                            hotel,
+                          },
+                        })
+                      }
                       className="mt-6 w-full rounded-lg bg-blue-600 px-4 py-3 font-medium text-white transition hover:bg-blue-700"
                     >
                       Book Now
