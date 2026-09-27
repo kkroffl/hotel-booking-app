@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 function Bookings() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
 
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +38,35 @@ function Bookings() {
     };
 
     fetchBookings();
-  }, [user]);
+  }, []);
+
+  const handleCancelBooking = async (bookingId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/bookings/${bookingId}/cancel`,
+        {
+          method: "PATCH",
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to cancel booking");
+      }
+
+      setBookings((currentBookings) =>
+        currentBookings.map((booking) =>
+          booking.id === bookingId
+            ? { ...booking, status: "CANCELLED" }
+            : booking,
+        ),
+      );
+    } catch (error) {
+      console.error("Failed to cancel booking:", error);
+      setError(error.message);
+    }
+  };
 
   if (!user) {
     return (
@@ -178,6 +207,17 @@ function Bookings() {
                     </p>
                   </div>
                 </div>
+                {booking.status === "CONFIRMED" && (
+                  <div className="mt-5 border-t pt-5">
+                    <button
+                      type="button"
+                      onClick={() => handleCancelBooking(booking.id)}
+                      className="rounded-lg bg-red-600 px-5 py-2.5 font-medium text-white transition hover:bg-red-700"
+                    >
+                      Cancel Booking
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>

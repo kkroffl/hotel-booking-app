@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Booking from "./pages/Booking";
 import Bookings from "./pages/Bookings";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -32,6 +33,8 @@ function App() {
           <Route path="/booking" element={<Booking />} />
 
           <Route path="/bookings" element={<Bookings />} />
+
+          <Route path="/profile" element={<Profile />} />
         </Route>
       </Routes>
     </BrowserRouter>

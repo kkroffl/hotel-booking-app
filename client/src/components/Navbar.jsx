@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import logo from "../assets/user.png";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -47,6 +48,17 @@ function Navbar() {
               <span className="font-medium text-gray-700">
                 Welcome, {user.name}
               </span>
+
+              <Link
+                to="/profile"
+                className="flex items-center text-gray-700 transition hover:text-blue-600"
+              >
+                <img
+                  src={logo}
+                  alt="Profile Icon"
+                  className="h-8 w-8 object-contain"
+                />
+              </Link>
 
               <button
                 type="button"
