@@ -22,6 +22,7 @@ model User {
 
   bookings  Booking[]
   reviews   Review[]
+  managedHotel Hotel?
 }
 
 model Hotel {
@@ -35,9 +36,11 @@ model Hotel {
   longitude   Float?
   image       String
   rating      Float?
+  managerId   Int?     @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  manager     User?    @relation(fields: [managerId], references: [id])
   rooms       Room[]
   reviews     Review[]
 }

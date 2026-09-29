@@ -10,6 +10,7 @@ const bookingRoutes = require("./routes/bookingRoutes");
 const authRoutes = require("./routes/authRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const managerRoutes = require("./routes/managerRoutes");
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/manager", managerRoutes);
 
 app.get("/", (req, res) => {
   res.json({
