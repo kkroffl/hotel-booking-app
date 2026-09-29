@@ -12,6 +12,7 @@ import Bookings from "./pages/Bookings";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLogin from "./pages/admin/AdminLogin";
+import ManagerDashboard from "./pages/manager/ManagerDashboard";
 
 function App() {
   return (
@@ -41,6 +42,8 @@ function App() {
           <Route path="/admin" element={<AdminDashboard />} />
 
           <Route path="/admin/login" element={<AdminLogin />} />
+
+          <Route path="/manager" element={<ManagerDashboard />} />
         </Route>
       </Routes>
     </BrowserRouter>
