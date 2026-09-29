@@ -42,7 +42,11 @@ function Login() {
       window.dispatchEvent(new Event("authChanged"));
 
       // Go back to the home page after successful login.
-      navigate("/");
+      if (data.user.role === "ADMIN") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       console.error("Login failed:", error);
       setError(error.message);
@@ -119,6 +123,18 @@ function Login() {
               {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
+
+          {/* Admin Link   */}
+          <p className="mt-6 text-center text-sm text-gray-500">
+            Are you an admin?{" "}
+            <button
+              type="button"
+              onClick={() => navigate("/admin/login")}
+              className="font-medium text-blue-600 hover:text-blue-700"
+            >
+              Admin Login
+            </button>
+          </p>
 
           {/* Register link */}
           <div className="mt-6 text-center text-sm text-gray-600">
