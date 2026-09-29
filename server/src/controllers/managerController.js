@@ -122,7 +122,65 @@ const getManagerDashboard = async (req, res) => {
   }
 };
 
+const updateManagerHotel = async (req, res) => {
+  try {
+    const hotel = await prisma.hotel.findUnique({
+      where: {
+        managerId: req.user.id,
+      },
+    });
+
+    if (!hotel) {
+      return res.status(404).json({
+        status: "error",
+        message: "No hotel is assigned to this manager",
+      });
+    }
+
+    const {
+      name,
+      description,
+      address,
+      city,
+      country,
+      latitude,
+      longitude,
+      image,
+    } = req.body;
+
+    const updatedHotel = await prisma.hotel.update({
+      where: {
+        id: hotel.id,
+      },
+      data: {
+        name,
+        description,
+        address,
+        city,
+        country,
+        latitude,
+        longitude,
+        image,
+      },
+    });
+
+    res.json({
+      status: "success",
+      message: "Hotel updated successfully",
+      hotel: updatedHotel,
+    });
+  } catch (error) {
+    console.error("Failed to update manager hotel:", error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Failed to update hotel",
+    });
+  }
+};
+
 module.exports = {
   getManagerHotel,
   getManagerDashboard,
+  updateManagerHotel,
 };

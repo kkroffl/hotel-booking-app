@@ -4,7 +4,7 @@ const prisma = require("../prisma");
 // Register a new user
 const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     // Check that all required fields were provided
     if (!name || !email || !password) {
@@ -28,6 +28,7 @@ const register = async (req, res) => {
 
     // Hash the password before storing it
     const hashedPassword = await bcrypt.hash(password, 10);
+    const userRole = role === "HOTEL_MANAGER" ? "HOTEL_MANAGER" : "USER";
 
     // Create the user in PostgreSQL
     const user = await prisma.user.create({
@@ -35,6 +36,7 @@ const register = async (req, res) => {
         name,
         email,
         password: hashedPassword,
+        role: userRole,
       },
     });
 

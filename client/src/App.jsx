@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import MainLayout from "./layouts/MainLayout";
+import ManagerLayout from "./layouts/ManagerLayout";
 
 import Home from "./pages/Home";
 import Hotels from "./pages/Hotels";
@@ -13,6 +14,7 @@ import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLogin from "./pages/admin/AdminLogin";
 import ManagerDashboard from "./pages/manager/ManagerDashboard";
+import ManagerLogin from "./pages/manager/ManagerLogin";
 
 function App() {
   return (
@@ -43,7 +45,11 @@ function App() {
 
           <Route path="/admin/login" element={<AdminLogin />} />
 
-          <Route path="/manager" element={<ManagerDashboard />} />
+          <Route element={<ManagerLayout />}>
+            <Route path="/manager" element={<ManagerDashboard />} />
+          </Route>
+
+          <Route path="/manager/login" element={<ManagerLogin />} />
         </Route>
       </Routes>
     </BrowserRouter>

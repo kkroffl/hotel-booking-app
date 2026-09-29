@@ -13,6 +13,7 @@ function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState("USER");
 
   // Handle form submission for now.
   const handleSubmit = async (event) => {
@@ -38,6 +39,7 @@ function Register() {
           name,
           email,
           password,
+          role,
         }),
       });
 
@@ -128,6 +130,22 @@ function Register() {
                 required
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
+            </div>
+
+            {/* Account Type */}
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Account Type
+              </label>
+
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="mt-1 w-full rounded-lg border px-4 py-3 outline-none focus:border-black"
+              >
+                <option value="USER">Guest</option>
+                <option value="HOTEL_MANAGER">Hotel Manager</option>
+              </select>
             </div>
 
             {/* Password */}
