@@ -15,6 +15,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLogin from "./pages/admin/AdminLogin";
 import ManagerDashboard from "./pages/manager/ManagerDashboard";
 import ManagerLogin from "./pages/manager/ManagerLogin";
+import CreateHotel from "./pages/manager/CreateHotel";
 
 function App() {
   return (
@@ -47,6 +48,8 @@ function App() {
 
           <Route element={<ManagerLayout />}>
             <Route path="/manager" element={<ManagerDashboard />} />
+
+            <Route path="/manager/create-hotel" element={<CreateHotel />} />
           </Route>
 
           <Route path="/manager/login" element={<ManagerLogin />} />

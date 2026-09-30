@@ -179,8 +179,71 @@ const updateManagerHotel = async (req, res) => {
   }
 };
 
+const createManagerHotel = async (req, res) => {
+  try {
+    const existingHotel = await prisma.hotel.findUnique({
+      where: {
+        managerId: req.user.id,
+      },
+    });
+
+    if (existingHotel) {
+      return res.status(400).json({
+        status: "error",
+        message: "You already have a hotel",
+      });
+    }
+
+    const {
+      name,
+      description,
+      address,
+      city,
+      country,
+      latitude,
+      longitude,
+      image,
+    } = req.body;
+
+    if (!name || !description || !address || !city || !country) {
+      return res.status(400).json({
+        status: "error",
+        message: "Please fill in all required fields",
+      });
+    }
+
+    const hotel = await prisma.hotel.create({
+      data: {
+        name,
+        description,
+        address,
+        city,
+        country,
+        latitude: latitude ? Number(latitude) : null,
+        longitude: longitude ? Number(longitude) : null,
+        image: image || "",
+        managerId: req.user.id,
+      },
+    });
+
+    res.status(201).json({
+      status: "success",
+      message: "Hotel created successfully",
+      hotel,
+    });
+  } catch (error) {
+    console.error("Failed to create manager hotel:", error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Failed to create hotel",
+    });
+  }
+};
+
 module.exports = {
   getManagerHotel,
   getManagerDashboard,
   updateManagerHotel,
+  createManagerHotel,
 };

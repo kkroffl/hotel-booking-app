@@ -53,7 +53,11 @@ function Register() {
 
       // Give the user a moment to see the success message.
       setTimeout(() => {
-        navigate("/login");
+        if (role === "HOTEL_MANAGER") {
+          navigate("/manager/login");
+        } else {
+          navigate("/login");
+        }
       }, 1000);
     } catch (error) {
       console.error("Registration failed:", error);

@@ -124,17 +124,23 @@ function Login() {
             </button>
           </form>
 
-          {/* Admin Link   */}
-          <p className="mt-6 text-center text-sm text-gray-500">
-            Are you an admin?{" "}
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            {/* Admin Link   */}
             <button
-              type="button"
               onClick={() => navigate("/admin/login")}
-              className="font-medium text-blue-600 hover:text-blue-700"
+              className="rounded-lg bg-black px-4 py-3 text-sm font-medium text-white transition hover:bg-gray-800"
             >
               Admin Login
             </button>
-          </p>
+
+            {/* Hotel Manager Link   */}
+            <button
+              onClick={() => navigate("/manager/login")}
+              className="rounded-lg bg-black px-4 py-3 text-sm font-medium text-white transition hover:bg-gray-800"
+            >
+              Manager Login
+            </button>
+          </div>
 
           {/* Register link */}
           <div className="mt-6 text-center text-sm text-gray-600">
