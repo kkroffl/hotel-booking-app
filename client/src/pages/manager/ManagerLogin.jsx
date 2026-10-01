@@ -39,8 +39,25 @@ function ManagerLogin() {
       localStorage.setItem("user", JSON.stringify(data.user));
       window.dispatchEvent(new Event("authChanged"));
 
-      navigate("/manager");
-    } catch (error) {
+      const hotelResponse = await fetch(
+        "http://localhost:5000/api/manager/hotel",
+        {
+          headers: {
+            "x-user-id": data.user.id,
+          },
+        },
+      );
+
+      const hotelData = await hotelResponse.json();
+
+      if (hotelResponse.ok && hotelData.status === "success") {
+        navigate("/manager");
+      } else if (hotelResponse.status === 404) {
+        navigate("/manager/create-hotel");
+      } else {
+        setError(hotelData.message || "Failed to check hotel");
+      }
+    } catch {
       setError("Unable to connect to server");
     }
   };

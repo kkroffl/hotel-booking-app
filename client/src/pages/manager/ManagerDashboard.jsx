@@ -1,19 +1,43 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function ManagerDashboard() {
   const [dashboard, setDashboard] = useState(null);
   const [error, setError] = useState("");
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
 
-    fetch("http://localhost:5000/api/manager/dashboard", {
+    fetch("http://localhost:5000/api/manager/hotel", {
       headers: {
         "x-user-id": user.id,
       },
     })
-      .then((response) => response.json())
-      .then((data) => {
+      .then(async (response) => {
+        const data = await response.json();
+
+        if (response.status === 404) {
+          navigate("/manager/create-hotel");
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to load hotel");
+        }
+
+        return fetch("http://localhost:5000/api/manager/dashboard", {
+          headers: {
+            "x-user-id": user.id,
+          },
+        });
+      })
+      .then(async (response) => {
+        if (!response) return;
+
+        const data = await response.json();
+
         if (data.status === "success") {
           setDashboard(data.dashboard);
         } else {
@@ -23,7 +47,7 @@ function ManagerDashboard() {
       .catch(() => {
         setError("Failed to load manager dashboard");
       });
-  }, []);
+  }, [navigate]);
 
   if (error) {
     return <div className="p-8 text-red-600">{error}</div>;
