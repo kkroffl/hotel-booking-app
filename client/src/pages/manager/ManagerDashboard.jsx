@@ -20,7 +20,7 @@ function ManagerDashboard() {
 
         if (response.status === 404) {
           navigate("/manager/create-hotel");
-          return;
+          return null;
         }
 
         if (!response.ok) {
@@ -59,120 +59,216 @@ function ManagerDashboard() {
 
   const { hotel, stats, bookings } = dashboard;
 
+  const recentBookings = bookings.slice(0, 5);
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "CONFIRMED":
+        return "bg-green-100 text-green-700";
+
+      case "COMPLETED":
+        return "bg-blue-100 text-blue-700";
+
+      case "CANCELLED":
+        return "bg-red-100 text-red-700";
+
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 px-6 py-8">
-      <div className="mx-auto max-w-7xl">
+    <div>
+      <div>
         <h1 className="text-3xl font-bold text-gray-900">Manager Dashboard</h1>
 
         <p className="mt-1 text-gray-600">Manage {hotel.name}</p>
+      </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
-          <div className="rounded-xl bg-white p-5 shadow">
-            <p className="text-sm text-gray-500">Rooms</p>
-            <p className="mt-2 text-3xl font-bold">{stats.rooms}</p>
+      {/* Stats */}
+      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="rounded-xl bg-white p-5 shadow">
+          <p className="text-sm text-gray-500">Rooms</p>
+          <p className="mt-2 text-3xl font-bold">{stats.rooms}</p>
+        </div>
+
+        <div className="rounded-xl bg-white p-5 shadow">
+          <p className="text-sm text-gray-500">Bookings</p>
+          <p className="mt-2 text-3xl font-bold">{stats.bookings}</p>
+        </div>
+
+        <div className="rounded-xl bg-white p-5 shadow">
+          <p className="text-sm text-gray-500">Guests</p>
+          <p className="mt-2 text-3xl font-bold">{stats.guests}</p>
+        </div>
+
+        <div className="rounded-xl bg-white p-5 shadow">
+          <p className="text-sm text-gray-500">Reviews</p>
+          <p className="mt-2 text-3xl font-bold">{stats.reviews}</p>
+        </div>
+
+        <div className="rounded-xl bg-white p-5 shadow">
+          <p className="text-sm text-gray-500">Revenue</p>
+          <p className="mt-2 text-3xl font-bold">
+            ₹{stats.revenue.toLocaleString("en-IN")}
+          </p>
+        </div>
+      </div>
+
+      {/* Hotel Overview */}
+      <div className="mt-8 rounded-xl bg-white p-6 shadow">
+        <h2 className="text-xl font-semibold text-gray-900">Hotel Overview</h2>
+
+        <div className="mt-5 grid gap-5 md:grid-cols-2">
+          <div>
+            <p className="text-sm text-gray-500">Hotel Name</p>
+            <p className="mt-1 font-medium text-gray-900">{hotel.name}</p>
           </div>
 
-          <div className="rounded-xl bg-white p-5 shadow">
-            <p className="text-sm text-gray-500">Bookings</p>
-            <p className="mt-2 text-3xl font-bold">{stats.bookings}</p>
-          </div>
-
-          <div className="rounded-xl bg-white p-5 shadow">
-            <p className="text-sm text-gray-500">Guests</p>
-            <p className="mt-2 text-3xl font-bold">{stats.guests}</p>
-          </div>
-
-          <div className="rounded-xl bg-white p-5 shadow">
-            <p className="text-sm text-gray-500">Reviews</p>
-            <p className="mt-2 text-3xl font-bold">{stats.reviews}</p>
-          </div>
-
-          <div className="rounded-xl bg-white p-5 shadow">
-            <p className="text-sm text-gray-500">Revenue</p>
-            <p className="mt-2 text-3xl font-bold">
-              ₹{stats.revenue.toLocaleString("en-IN")}
+          <div>
+            <p className="text-sm text-gray-500">Location</p>
+            <p className="mt-1 font-medium text-gray-900">
+              {hotel.city}, {hotel.country}
             </p>
           </div>
-        </div>
 
-        <div className="mt-8 rounded-xl bg-white p-6 shadow">
-          <h2 className="text-xl font-semibold text-gray-900">
-            Hotel Overview
-          </h2>
+          <div>
+            <p className="text-sm text-gray-500">Rating</p>
+            <p className="mt-1 font-medium text-gray-900">
+              {hotel.rating ?? "No rating yet"}
+            </p>
+          </div>
 
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <div>
-              <p className="text-sm text-gray-500">Hotel Name</p>
-              <p className="font-medium">{hotel.name}</p>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-500">Location</p>
-              <p className="font-medium">
-                {hotel.city}, {hotel.country}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-500">Rating</p>
-              <p className="font-medium">{hotel.rating ?? "No rating yet"}</p>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-500">Address</p>
-              <p className="font-medium">{hotel.address}</p>
-            </div>
+          <div>
+            <p className="text-sm text-gray-500">Address</p>
+            <p className="mt-1 font-medium text-gray-900">{hotel.address}</p>
           </div>
         </div>
+      </div>
 
-        <div className="mt-8 rounded-xl bg-white p-6 shadow">
-          <h2 className="text-xl font-semibold text-gray-900">
-            Recent Bookings
-          </h2>
+      {/* Recent Bookings */}
+      <div className="mt-8 rounded-xl bg-white shadow">
+        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-5">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Recent Bookings
+            </h2>
 
-          {bookings.length === 0 ? (
-            <p className="mt-4 text-gray-500">No bookings yet.</p>
-          ) : (
-            <div className="mt-4 overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b text-sm text-gray-500">
-                    <th className="px-4 py-3">Guest</th>
-                    <th className="px-4 py-3">Room</th>
-                    <th className="px-4 py-3">Check-in</th>
-                    <th className="px-4 py-3">Check-out</th>
-                    <th className="px-4 py-3">Amount</th>
-                    <th className="px-4 py-3">Status</th>
-                  </tr>
-                </thead>
+            <p className="mt-1 text-sm text-gray-500">
+              Latest bookings for your hotel
+            </p>
+          </div>
 
-                <tbody>
-                  {bookings.map((booking) => (
-                    <tr key={booking.id} className="border-b">
-                      <td className="px-4 py-3">{booking.user.name}</td>
-
-                      <td className="px-4 py-3">{booking.room.name}</td>
-
-                      <td className="px-4 py-3">
-                        {new Date(booking.checkIn).toLocaleDateString()}
-                      </td>
-
-                      <td className="px-4 py-3">
-                        {new Date(booking.checkOut).toLocaleDateString()}
-                      </td>
-
-                      <td className="px-4 py-3">
-                        ₹{booking.totalPrice.toLocaleString("en-IN")}
-                      </td>
-
-                      <td className="px-4 py-3">{booking.status}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          {bookings.length > 0 && (
+            <button
+              onClick={() => navigate("/manager/bookings")}
+              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              View All
+            </button>
           )}
         </div>
+
+        {recentBookings.length === 0 ? (
+          <div className="px-6 py-10 text-center">
+            <p className="text-gray-500">No bookings yet.</p>
+
+            <p className="mt-1 text-sm text-gray-400">
+              New hotel bookings will appear here.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[900px] text-left">
+              <thead>
+                <tr className="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-500">
+                  <th className="px-6 py-4 font-medium">Booking</th>
+
+                  <th className="px-6 py-4 font-medium">Guest</th>
+
+                  <th className="px-6 py-4 font-medium">Room</th>
+
+                  <th className="px-6 py-4 font-medium">Stay</th>
+
+                  <th className="px-6 py-4 font-medium">Guests</th>
+
+                  <th className="px-6 py-4 font-medium">Amount</th>
+
+                  <th className="px-6 py-4 font-medium">Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {recentBookings.map((booking) => (
+                  <tr
+                    key={booking.id}
+                    className="border-b border-gray-100 last:border-0 hover:bg-gray-50"
+                  >
+                    <td className="px-6 py-4">
+                      <p className="font-medium text-gray-900">#{booking.id}</p>
+
+                      <p className="mt-1 text-xs text-gray-400">
+                        {formatDate(booking.createdAt)}
+                      </p>
+                    </td>
+
+                    <td className="px-6 py-4">
+                      <p className="font-medium text-gray-900">
+                        {booking.user.name}
+                      </p>
+
+                      <p className="mt-1 text-xs text-gray-500">
+                        {booking.user.email}
+                      </p>
+                    </td>
+
+                    <td className="px-6 py-4">
+                      <p className="font-medium text-gray-900">
+                        {booking.room.name}
+                      </p>
+                    </td>
+
+                    <td className="px-6 py-4">
+                      <p className="text-sm text-gray-900">
+                        {formatDate(booking.checkIn)}
+                      </p>
+
+                      <p className="mt-1 text-xs text-gray-500">
+                        to {formatDate(booking.checkOut)}
+                      </p>
+                    </td>
+
+                    <td className="px-6 py-4 text-sm text-gray-700">
+                      {booking.guests}
+                    </td>
+
+                    <td className="px-6 py-4 font-medium text-gray-900">
+                      ₹{booking.totalPrice.toLocaleString("en-IN")}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getStatusClass(
+                          booking.status,
+                        )}`}
+                      >
+                        {booking.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

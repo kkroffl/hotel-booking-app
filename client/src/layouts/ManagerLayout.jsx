@@ -1,7 +1,11 @@
+import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
 function ManagerLayout() {
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -9,84 +13,124 @@ function ManagerLayout() {
     navigate("/manager/login");
   };
 
-  const linkClass = ({ isActive }) =>
-    `block rounded-lg px-4 py-3 text-sm font-medium ${
-      isActive ? "bg-black text-white" : "text-gray-600 hover:bg-gray-100"
-    }`;
+  const navigation = [
+    {
+      name: "Dashboard",
+      path: "/manager",
+    },
+    {
+      name: "My Hotel",
+      path: "/manager/hotel",
+    },
+    {
+      name: "Rooms",
+      path: "/manager/rooms",
+    },
+    {
+      name: "Bookings",
+      path: "/manager/bookings",
+    },
+    {
+      name: "Reviews",
+      path: "/manager/reviews",
+    },
+    {
+      name: "Analytics",
+      path: "/manager/analytics",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="flex min-h-screen">
-        <aside className="w-64 border-r bg-white p-5">
-          <h1 className="px-4 text-2xl font-bold">StayNest</h1>
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-40 bg-black/30 lg:hidden"
+          aria-label="Close sidebar"
+        />
+      )}
 
-          <p className="px-4 pt-1 text-sm text-gray-500">Manager Portal</p>
+      {/* Sidebar */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-gray-200 bg-white transition-transform duration-200 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0`}
+      >
+        {/* Brand */}
+        <div className="border-b border-gray-200 px-6 py-6">
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+            StayNest
+          </h1>
 
-          <nav className="mt-8 space-y-2">
-            <NavLink to="/manager" end className={linkClass}>
-              Dashboard
-            </NavLink>
+          <p className="mt-1 text-sm text-gray-500">Manager Portal</p>
+        </div>
 
-            <NavLink to="/manager/hotel" className={linkClass}>
-              My Hotel
-            </NavLink>
+        {/* Navigation */}
+        <nav className="flex-1 px-3 py-6">
+          <p className="px-3 pb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            Management
+          </p>
 
-            <NavLink to="/manager/rooms" className={linkClass}>
-              Rooms
-            </NavLink>
+          <div className="space-y-1">
+            {navigation.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                end={item.path === "/manager"}
+                onClick={() => setSidebarOpen(false)}
+                className={({ isActive }) =>
+                  `block rounded-lg px-3 py-3 text-sm font-medium transition ${
+                    isActive
+                      ? "bg-black text-white"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  }`
+                }
+              >
+                {item.name}
+              </NavLink>
+            ))}
+          </div>
+        </nav>
 
-            <NavLink to="/manager/bookings" className={linkClass}>
-              Bookings
-            </NavLink>
+        {/* Manager account */}
+        <div className="border-t border-gray-200 p-4">
+          <div className="rounded-lg bg-gray-50 p-3">
+            <p className="truncate text-sm font-semibold text-gray-900">
+              {user?.name || "Hotel Manager"}
+            </p>
 
-            <NavLink to="/manager/reviews" className={linkClass}>
-              Reviews
-            </NavLink>
-
-            <NavLink to="/manager/analytics" className={linkClass}>
-              Analytics
-            </NavLink>
-          </nav>
+            <p className="mt-1 text-xs text-gray-500">
+              {user?.email || "Hotel Manager"}
+            </p>
+          </div>
 
           <button
+            type="button"
             onClick={handleLogout}
-            className="mt-8 w-full rounded-lg px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50"
+            className="mt-3 w-full rounded-lg px-3 py-3 text-left text-sm font-medium text-red-600 transition hover:bg-red-50"
           >
             Logout
           </button>
-        </aside>
+        </div>
+      </aside>
 
-        <main className="flex-1">
-          <div className="border-b bg-white px-8 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Manager Portal
-                </h2>
-                <p className="text-sm text-gray-500">
-                  Manage your hotel and bookings
-                </p>
-              </div>
+      {/* Mobile menu button */}
+      <button
+        type="button"
+        onClick={() => setSidebarOpen(true)}
+        className="fixed left-4 top-4 z-30 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm lg:hidden"
+      >
+        Menu
+      </button>
 
-              <div className="flex items-center gap-3">
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-900">
-                    {JSON.parse(localStorage.getItem("user"))?.name}
-                  </p>
-                  <p className="text-xs text-gray-500">Hotel Manager</p>
-                </div>
-
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 font-semibold text-gray-700">
-                  {JSON.parse(localStorage.getItem("user"))?.name?.charAt(0)}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="p-8">
-            <Outlet />
-          </div>{" "}
-        </main>
-      </div>
+      {/* Main content */}
+      <main className="min-h-screen lg:ml-64">
+        <div className="p-6 pt-16 sm:p-8 sm:pt-16 lg:p-10">
+          <Outlet />
+        </div>
+      </main>
     </div>
   );
 }

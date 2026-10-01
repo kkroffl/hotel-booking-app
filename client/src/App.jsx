@@ -18,6 +18,7 @@ import ManagerLogin from "./pages/manager/ManagerLogin";
 import CreateHotel from "./pages/manager/CreateHotel";
 import MyHotel from "./pages/manager/MyHotel";
 import ManagerRooms from "./pages/manager/ManagerRooms";
+import ManagerBookings from "./pages/manager/ManagerBookings";
 
 function App() {
   return (
@@ -48,17 +49,23 @@ function App() {
 
           <Route path="/admin/login" element={<AdminLogin />} />
 
-          <Route element={<ManagerLayout />}>
-            <Route path="/manager" element={<ManagerDashboard />} />
-
-            <Route path="/manager/create-hotel" element={<CreateHotel />} />
-
-            <Route path="/manager/hotel" element={<MyHotel />} />
-
-            <Route path="/manager/rooms" element={<ManagerRooms />} />
-          </Route>
-
           <Route path="/manager/login" element={<ManagerLogin />} />
+        </Route>
+
+        {/* 
+          All routes inside ManagerLayout automatically
+          receive the same Sidebar and Footer.
+        */}
+        <Route element={<ManagerLayout />}>
+          <Route path="/manager" element={<ManagerDashboard />} />
+
+          <Route path="/manager/create-hotel" element={<CreateHotel />} />
+
+          <Route path="/manager/hotel" element={<MyHotel />} />
+
+          <Route path="/manager/rooms" element={<ManagerRooms />} />
+
+          <Route path="/manager/bookings" element={<ManagerBookings />} />
         </Route>
       </Routes>
     </BrowserRouter>
