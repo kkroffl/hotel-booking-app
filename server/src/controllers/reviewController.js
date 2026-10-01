@@ -45,7 +45,9 @@ const createReview = async (req, res) => {
       });
     }
 
-    if (rating < 1 || rating > 5) {
+    const numericRating = Number(rating);
+
+    if (numericRating < 1 || numericRating > 5) {
       return res.status(400).json({
         status: "error",
         message: "Rating must be between 1 and 5",
@@ -53,7 +55,9 @@ const createReview = async (req, res) => {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: Number(userId) },
+      where: {
+        id: Number(userId),
+      },
     });
 
     if (!user) {
@@ -64,7 +68,9 @@ const createReview = async (req, res) => {
     }
 
     const hotel = await prisma.hotel.findUnique({
-      where: { id: Number(hotelId) },
+      where: {
+        id: Number(hotelId),
+      },
     });
 
     if (!hotel) {
@@ -74,13 +80,26 @@ const createReview = async (req, res) => {
       });
     }
 
+    // Prevent multiple reviews for the same hotel
+    const existingReview = await prisma.review.findFirst({
+      where: {
+        userId: Number(userId),
+        hotelId: Number(hotelId),
+      },
+    });
+
+    if (existingReview) {
+      return res.status(409).json({
+        status: "error",
+        message: "You have already reviewed this hotel",
+      });
+    }
+
+    // User must have completed a stay at this hotel
     const completedBooking = await prisma.booking.findFirst({
       where: {
         userId: Number(userId),
-        status: "CONFIRMED",
-        checkOut: {
-          lt: new Date(),
-        },
+        status: "COMPLETED",
         room: {
           hotelId: Number(hotelId),
         },
@@ -98,8 +117,8 @@ const createReview = async (req, res) => {
       data: {
         userId: Number(userId),
         hotelId: Number(hotelId),
-        rating: Number(rating),
-        comment,
+        rating: numericRating,
+        comment: comment.trim(),
       },
       include: {
         user: {
@@ -108,6 +127,27 @@ const createReview = async (req, res) => {
             name: true,
           },
         },
+      },
+    });
+
+    // Recalculate the hotel's average rating
+    const ratingAggregate = await prisma.review.aggregate({
+      where: {
+        hotelId: Number(hotelId),
+      },
+      _avg: {
+        rating: true,
+      },
+    });
+
+    await prisma.hotel.update({
+      where: {
+        id: Number(hotelId),
+      },
+      data: {
+        rating: ratingAggregate._avg.rating
+          ? Number(ratingAggregate._avg.rating.toFixed(1))
+          : null,
       },
     });
 

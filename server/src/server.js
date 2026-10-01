@@ -12,6 +12,8 @@ const reviewRoutes = require("./routes/reviewRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const managerRoutes = require("./routes/managerRoutes");
 const managerRoomRoutes = require("./routes/managerRoomRoutes");
+const managerReviewRoutes = require("./routes/managerReviewRoutes");
+const managerAnalyticsRoutes = require("./routes/managerAnalyticsRoutes");
 
 const app = express();
 
@@ -26,6 +28,8 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/manager", managerRoutes);
 app.use("/api/manager/rooms", managerRoomRoutes);
+app.use("/api/manager/reviews", managerReviewRoutes);
+app.use("/api/manager/analytics", managerAnalyticsRoutes);
 
 app.get("/", (req, res) => {
   res.json({

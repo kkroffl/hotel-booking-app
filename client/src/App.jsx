@@ -19,6 +19,8 @@ import CreateHotel from "./pages/manager/CreateHotel";
 import MyHotel from "./pages/manager/MyHotel";
 import ManagerRooms from "./pages/manager/ManagerRooms";
 import ManagerBookings from "./pages/manager/ManagerBookings";
+import ManagerReviews from "./pages/manager/ManagerReviews";
+import ManagerAnalytics from "./pages/manager/ManagerAnalytics";
 
 function App() {
   return (
@@ -66,6 +68,10 @@ function App() {
           <Route path="/manager/rooms" element={<ManagerRooms />} />
 
           <Route path="/manager/bookings" element={<ManagerBookings />} />
+
+          <Route path="/manager/reviews" element={<ManagerReviews />} />
+
+          <Route path="/manager/analytics" element={<ManagerAnalytics />} />
         </Route>
       </Routes>
     </BrowserRouter>
