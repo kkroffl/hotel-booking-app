@@ -4,41 +4,35 @@ import HotelCard from "../components/HotelCard";
 import FeatureCard from "../components/FeatureCard";
 
 function Home() {
-  // Stores hotel data received from our backend API
   const [hotels, setHotels] = useState([]);
-
-  // Shows a loading message while the API request is running
   const [loading, setLoading] = useState(true);
-
-  // Stores an error message if the API request fails
   const [error, setError] = useState("");
 
-  // Fetch hotel data from our Express backend
   useEffect(() => {
-    const fetchHotels = async () => {
+    const fetchFeaturedHotels = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/hotels");
+        const response = await fetch(
+          "http://localhost:5000/api/hotels/featured",
+        );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch hotels");
+          throw new Error("Failed to fetch featured hotels");
         }
 
         const data = await response.json();
 
-        // Store the hotels returned by PostgreSQL
         setHotels(data.hotels);
       } catch (error) {
-        console.error("Failed to load hotels:", error);
-        setError("Unable to load hotels");
+        console.error("Failed to load featured hotels:", error);
+        setError("Unable to load featured hotels");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchHotels();
+    fetchFeaturedHotels();
   }, []);
 
-  // Show this while waiting for the backend response
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -47,7 +41,6 @@ function Home() {
     );
   }
 
-  // Show this if the API request fails
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -77,21 +70,16 @@ function Home() {
       {/* Featured hotels section */}
       <section className="bg-gray-50 px-6 py-16">
         <div className="mx-auto max-w-7xl">
-          {/* Section heading */}
           <div className="mb-10">
             <h2 className="text-3xl font-bold text-gray-900">
               Featured Hotels
             </h2>
 
             <p className="mt-2 text-gray-600">
-              Explore some of our popular stays.
+              Explore some of our top-rated stays.
             </p>
           </div>
 
-          {/* 
-            We now loop through hotel data received
-            from PostgreSQL through our backend API.
-          */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {hotels.map((hotel) => (
               <HotelCard key={hotel.id} hotel={hotel} />
@@ -103,7 +91,6 @@ function Home() {
       {/* Why StayNest section */}
       <section className="bg-white px-6 py-16">
         <div className="mx-auto max-w-7xl">
-          {/* Section heading */}
           <div className="mb-10 text-center">
             <h2 className="text-3xl font-bold text-gray-900">Why StayNest?</h2>
 
@@ -113,7 +100,6 @@ function Home() {
             </p>
           </div>
 
-          {/* Feature cards */}
           <div className="grid gap-6 md:grid-cols-3">
             <FeatureCard
               icon="💰"
