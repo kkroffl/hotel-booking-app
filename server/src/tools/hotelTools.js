@@ -1,5 +1,31 @@
 const prisma = require("../prisma");
 
+const validateBookingDates = (checkIn, checkOut, guests) => {
+  const checkInDate = new Date(checkIn);
+  const checkOutDate = new Date(checkOut);
+
+  if (Number.isNaN(checkInDate.getTime())) {
+    throw new Error("Invalid check-in date.");
+  }
+
+  if (Number.isNaN(checkOutDate.getTime())) {
+    throw new Error("Invalid check-out date.");
+  }
+
+  if (checkOutDate <= checkInDate) {
+    throw new Error("Check-out date must be after check-in date.");
+  }
+
+  if (Number(guests) < 1) {
+    throw new Error("Guests must be at least 1.");
+  }
+
+  return {
+    checkInDate,
+    checkOutDate,
+  };
+};
+
 const searchHotels = async ({ city, maxPrice, minRating }) => {
   const where = {};
 
@@ -110,6 +136,12 @@ const getHotelDetails = async ({ hotelId }) => {
 };
 
 const checkAvailability = async ({ roomId, checkIn, checkOut, guests }) => {
+  const { checkInDate, checkOutDate } = validateBookingDates(
+    checkIn,
+    checkOut,
+    guests,
+  );
+
   const room = await prisma.room.findUnique({
     where: {
       id: Number(roomId),
@@ -120,10 +152,10 @@ const checkAvailability = async ({ roomId, checkIn, checkOut, guests }) => {
         where: {
           status: "CONFIRMED",
           checkIn: {
-            lt: new Date(checkOut),
+            lt: checkOutDate,
           },
           checkOut: {
-            gt: new Date(checkIn),
+            gt: checkInDate,
           },
         },
       },
@@ -159,8 +191,78 @@ const checkAvailability = async ({ roomId, checkIn, checkOut, guests }) => {
   };
 };
 
+const searchAvailableRooms = async ({
+  hotelId,
+  checkIn,
+  checkOut,
+  guests,
+  maxPrice,
+}) => {
+  const { checkInDate, checkOutDate } = validateBookingDates(
+    checkIn,
+    checkOut,
+    guests,
+  );
+
+  const rooms = await prisma.room.findMany({
+    where: {
+      hotelId: Number(hotelId),
+      capacity: {
+        gte: Number(guests),
+      },
+      ...(maxPrice
+        ? {
+            price: {
+              lte: Number(maxPrice),
+            },
+          }
+        : {}),
+    },
+    include: {
+      hotel: {
+        select: {
+          id: true,
+          name: true,
+          city: true,
+        },
+      },
+      bookings: {
+        where: {
+          status: "CONFIRMED",
+          checkIn: {
+            lt: checkOutDate,
+          },
+          checkOut: {
+            gt: checkInDate,
+          },
+        },
+      },
+    },
+  });
+
+  return rooms
+    .filter((room) => room.bookings.length < room.totalRooms)
+    .map((room) => ({
+      hotelId: room.hotel.id,
+      hotel: room.hotel.name,
+      city: room.hotel.city,
+      roomId: room.id,
+      room: room.name,
+      description: room.description,
+      pricePerNight: room.price,
+      capacity: room.capacity,
+      totalRooms: room.totalRooms,
+      bookedRooms: room.bookings.length,
+      availableRooms: room.totalRooms - room.bookings.length,
+      checkIn,
+      checkOut,
+      guests: Number(guests),
+    }));
+};
+
 module.exports = {
   searchHotels,
   getHotelDetails,
   checkAvailability,
+  searchAvailableRooms,
 };

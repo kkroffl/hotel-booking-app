@@ -77,8 +77,45 @@ const checkAvailabilityTool = {
   },
 };
 
+const searchAvailableRoomsTool = {
+  type: "function",
+  function: {
+    name: "searchAvailableRooms",
+    description:
+      "Find available rooms at a specific StayNest hotel for given dates and number of guests. Optionally filter by maximum price per night.",
+    parameters: {
+      type: "object",
+      properties: {
+        hotelId: {
+          type: "number",
+          description: "The ID of the hotel.",
+        },
+        checkIn: {
+          type: "string",
+          description: "Check-in date in YYYY-MM-DD format.",
+        },
+        checkOut: {
+          type: "string",
+          description: "Check-out date in YYYY-MM-DD format.",
+        },
+        guests: {
+          type: "number",
+          description: "Number of guests.",
+        },
+        maxPrice: {
+          type: ["number", "null"],
+          description:
+            "Maximum price per night. Use null if the user did not specify a maximum price.",
+        },
+      },
+      required: ["hotelId", "checkIn", "checkOut", "guests", "maxPrice"],
+    },
+  },
+};
+
 module.exports = {
   searchHotelsTool,
   getHotelDetailsTool,
   checkAvailabilityTool,
+  searchAvailableRoomsTool,
 };

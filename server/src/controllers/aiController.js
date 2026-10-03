@@ -4,15 +4,22 @@ const {
   searchHotels,
   getHotelDetails,
   checkAvailability,
+  searchAvailableRooms,
 } = require("../tools/hotelTools");
 
 const {
   searchHotelsTool,
   getHotelDetailsTool,
   checkAvailabilityTool,
+  searchAvailableRoomsTool,
 } = require("../tools/toolDefinitions");
 
-const tools = [searchHotelsTool, getHotelDetailsTool, checkAvailabilityTool];
+const tools = [
+  searchHotelsTool,
+  getHotelDetailsTool,
+  checkAvailabilityTool,
+  searchAvailableRoomsTool,
+];
 
 const chatWithGroq = async (req, res) => {
   try {
@@ -66,6 +73,8 @@ const chatWithGroq = async (req, res) => {
           results = await getHotelDetails(args);
         } else if (toolCall.function.name === "checkAvailability") {
           results = await checkAvailability(args);
+        } else if (toolCall.function.name === "searchAvailableRooms") {
+          results = await searchAvailableRooms(args);
         } else {
           throw new Error(`Unknown tool: ${toolCall.function.name}`);
         }
