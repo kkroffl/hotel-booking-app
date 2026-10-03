@@ -12,91 +12,50 @@ The project was built from the ground up using React, Node.js, Express, PostgreS
 
 ### Home Page
 
-![StayNest Home Page](![alt text](image.png))
+![alt text](screenshots/image.png)
 The home page provides hotel search, date selection, guest selection, and access to featured hotels.
 
 ---
 
 ### Hotel Details
 
-![Hotel Details](![alt text](image-1.png))
-
+![alt text](screenshots/image-1.png)
 Each hotel has a dedicated details page containing hotel information, available rooms, pricing, ratings, and reviews.
 
 ---
 
 ### Room Booking
 
-![Room Booking](screenshots/booking.png)
-
+![alt text](screenshots/image-2.png)
 Users can select a room, provide their stay details, and create a reservation.
 
 ---
 
 ### My Bookings
 
-![My Bookings](screenshots/my-bookings.png)
-
+![alt text](screenshots/image-3.png)
 Users can view their reservations and manage eligible bookings, including cancellations.
-
----
-
-### User Profile
-
-![User Profile](screenshots/profile.png)
-
-The profile section provides users with access to their account information.
 
 ---
 
 ### StayNest AI Assistant
 
-![StayNest AI Assistant](screenshots/ai-chatbot.png)
-
+![alt text](screenshots/image-4.png)
 The application includes an AI-powered hotel assistant capable of understanding natural-language hotel requests and retrieving real hotel data from the StayNest database.
-
----
-
-### AI Hotel Search
-
-![AI Hotel Search](screenshots/ai-hotel-search.png)
-
-The assistant can search hotels using natural-language requirements such as location, price range, and rating.
-
----
-
-### AI Availability Search
-
-![AI Availability Search](screenshots/ai-availability.png)
-
-The assistant can search for available rooms using hotel, dates, guest count, and price requirements.
 
 ---
 
 ### Hotel Manager Dashboard
 
-![Manager Dashboard](screenshots/manager-dashboard.png)
-
+![alt text](screenshots/image-5.png)
 Hotel managers have a dedicated dashboard for monitoring their hotel's rooms, bookings, guests, reviews, and revenue.
 
 ---
 
-### Hotel Manager — Room Management
+### Hotel Manager Analytics
 
-![Manager Room Management](screenshots/manager-rooms.png)
-
-Managers can create, update, and delete rooms belonging to their assigned hotel.
-
----
-
-### Admin Dashboard
-
-![Admin Dashboard](screenshots/admin-dashboard.png)
-
-Administrators have a separate dashboard for managing and monitoring the platform.
-
-> **Note:** The screenshots above can be replaced with actual screenshots from the application.  
-> Recommended: keep the screenshots inside a `screenshots/` directory in the repository.
+![alt text](screenshots/image-6.png)
+Hotel Managers can see the performance of their Hotels and Rooms here.
 
 ---
 
