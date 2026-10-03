@@ -1,33 +1,102 @@
-# StayNest — Hotel Booking Web App
+# StayNest — Full-Stack Hotel Booking Platform
 
-StayNest is a full-stack hotel booking web application developed as a capstone project.
+StayNest is a full-stack hotel booking platform built as a capstone project.
 
-The application is being built with a modern React frontend, Node.js/Express backend, PostgreSQL database, and Prisma ORM. The goal is to provide a complete hotel discovery and booking experience including hotel search, filtering, authentication, room availability, reservations, reviews, and booking management.
+It provides a complete hotel discovery and reservation experience with separate customer, hotel manager, and administrator workflows. The application includes hotel and room management, real-time room availability based on bookings, reservations, reviews, role-based access, and an AI-powered hotel assistant connected directly to the application's PostgreSQL database.
+
+The project was built from the ground up using React, Node.js, Express, PostgreSQL, Prisma, and the Groq API.
 
 ---
 
-## 🚧 Project Status
+## 📸 Project Preview
 
-**Status:** In Development
+### Home Page
 
-The project is being developed incrementally in multiple development batches.
+![StayNest Home Page](![alt text](image.png))
+The home page provides hotel search, date selection, guest selection, and access to featured hotels.
 
-### Current Progress
+---
 
-- ✅ Frontend foundation completed
-- ✅ Hotel discovery interface completed
-- ✅ Search and filtering functionality implemented
-- ✅ Node.js + Express backend initialized
-- ✅ PostgreSQL database created
-- ✅ Prisma ORM configured
-- ✅ Prisma 7 configuration completed
-- 🔄 Database schema development
-- ⏳ User authentication
-- ⏳ Hotel and room management
-- ⏳ Booking system
-- ⏳ Reviews and ratings
-- ⏳ Admin functionality
-- ⏳ Deployment
+### Hotel Details
+
+![Hotel Details](![alt text](image-1.png))
+
+Each hotel has a dedicated details page containing hotel information, available rooms, pricing, ratings, and reviews.
+
+---
+
+### Room Booking
+
+![Room Booking](screenshots/booking.png)
+
+Users can select a room, provide their stay details, and create a reservation.
+
+---
+
+### My Bookings
+
+![My Bookings](screenshots/my-bookings.png)
+
+Users can view their reservations and manage eligible bookings, including cancellations.
+
+---
+
+### User Profile
+
+![User Profile](screenshots/profile.png)
+
+The profile section provides users with access to their account information.
+
+---
+
+### StayNest AI Assistant
+
+![StayNest AI Assistant](screenshots/ai-chatbot.png)
+
+The application includes an AI-powered hotel assistant capable of understanding natural-language hotel requests and retrieving real hotel data from the StayNest database.
+
+---
+
+### AI Hotel Search
+
+![AI Hotel Search](screenshots/ai-hotel-search.png)
+
+The assistant can search hotels using natural-language requirements such as location, price range, and rating.
+
+---
+
+### AI Availability Search
+
+![AI Availability Search](screenshots/ai-availability.png)
+
+The assistant can search for available rooms using hotel, dates, guest count, and price requirements.
+
+---
+
+### Hotel Manager Dashboard
+
+![Manager Dashboard](screenshots/manager-dashboard.png)
+
+Hotel managers have a dedicated dashboard for monitoring their hotel's rooms, bookings, guests, reviews, and revenue.
+
+---
+
+### Hotel Manager — Room Management
+
+![Manager Room Management](screenshots/manager-rooms.png)
+
+Managers can create, update, and delete rooms belonging to their assigned hotel.
+
+---
+
+### Admin Dashboard
+
+![Admin Dashboard](screenshots/admin-dashboard.png)
+
+Administrators have a separate dashboard for managing and monitoring the platform.
+
+> **Note:** The screenshots above can be replaced with actual screenshots from the application.  
+> Recommended: keep the screenshots inside a `screenshots/` directory in the repository.
 
 ---
 
@@ -39,14 +108,18 @@ The project is being developed incrementally in multiple development batches.
 - Vite
 - Tailwind CSS
 - React Router
+- React Markdown
+- remark-gfm
 
 ### Backend
 
 - Node.js
 - Express.js
 - REST API
+- Native Fetch API
 - CORS
 - dotenv
+- Nodemon
 
 ### Database
 
@@ -54,216 +127,166 @@ The project is being developed incrementally in multiple development batches.
 - Prisma ORM
 - pgAdmin
 
+### AI
+
+- Groq API
+- `openai/gpt-oss-120b`
+- AI Function / Tool Calling
+- Database-grounded AI responses
+
+### Authentication & Authorization
+
+- Role-based access control
+- Customer / Hotel Manager / Admin roles
+- Protected backend routes
+
 ### Development Tools
 
-- Visual Studio Code
 - Git
 - GitHub
+- Visual Studio Code
+- cURL
+- Postman
+- pgAdmin
 
----
-
-## 📁 Project Structure
+## 🏗️ Architecture
 
 ```text
-hotel-booking-app/
-│
-├── client/                     # React + Vite frontend
-│   ├── src/
-│   ├── public/
-│   └── package.json
-│
-├── server/                     # Node.js + Express backend
-│   ├── prisma/
-│   │   └── schema.prisma       # Prisma database schema
-│   │
-│   ├── src/
-│   │   ├── controllers/        # Request/controller logic
-│   │   ├── middleware/         # Express middleware
-│   │   ├── routes/             # API routes
-│   │   ├── services/           # Business logic
-│   │   ├── utils/              # Utility functions
-│   │   └── server.js           # Express server entry point
-│   │
-│   ├── .env                    # Local environment variables
-│   ├── package.json
-│   ├── prisma7.config.ts       # Prisma configuration
-│   └── tsconfig.json
-│
-├── .gitignore
-├── README.md
-└── ...
+React + Vite + Tailwind CSS
+            │
+            ▼
+        REST API
+            │
+            ▼
+    Node.js + Express
+       │          │
+       ▼          ▼
+    Prisma      Groq API
+       │          │
+       ▼          ▼
+ PostgreSQL   GPT-OSS-120B
 ```
-⚙️ Local Development Setup
 
-1. Clone the repository
-   git clone <repository-url>
-   cd hotel-booking-app
-2. Install frontend dependencies
-   cd client
-   npm install
+## 👥 User Roles
 
-Start the frontend:
+| **Customer** | Search hotels, view rooms, book and cancel bookings, review hotels, and use the AI assistant |
+| **Hotel Manager** | Manage assigned hotel, rooms, bookings, reviews, and analytics |
+| **Admin** | Platform-level administration and monitoring |
 
-npm run dev
+## 🗄️ Database Models
 
-The frontend runs on:
+```text
+User
+Hotel
+Room
+Booking
+Review
+```
 
-http://localhost:5173 3. Install backend dependencies
+The relationships between these entities support hotel management, room inventory, reservations, reviews, and database-grounded AI data retrieval.
 
-Open another terminal and navigate to:
+# ✨ Key Features
 
-cd server
+## Customer Features
 
-Install dependencies:
-
-npm install
-
-Start the backend:
-
-npm run dev
-
-The backend runs on:
-
-http://localhost:5000
-🔐 Environment Variables
-
-The backend requires a local .env file.
-
-Create:
-
-server/.env
-
-Example:
-
-DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/staynest"
-PORT=5000
-
-Replace YOUR_PASSWORD with the local PostgreSQL password.
-
-Important: .env contains sensitive database credentials and must never be committed to GitHub.
-
-🧬 Prisma
-
-Prisma is used as the ORM for the PostgreSQL database.
-
-The project currently uses Prisma 7.
-
-Prisma configuration is stored in:
-
-server/prisma7.config.ts
-
-The Prisma schema is stored in:
-
-server/prisma/schema.prisma
-
-Prisma commands should be executed from the server directory.
-
-Example:
-
-npx prisma db pull
-
-Database migrations will be introduced as the application schema is developed.
-
-🌿 Git Workflow
-
-Development is organized into incremental checkpoints.
-
-Each major development batch is committed and pushed to GitHub so that the project maintains a clear development history.
-
-Example:
-
-git status
-git add .
-git commit -m "feat: initialize backend and database foundation"
-git push
-📌 Development Roadmap
-Phase 1 — Frontend Foundation
-Project initialization
-UI architecture
-Navigation
-Hotel discovery
-Search
-Filtering
-Sorting
-Phase 2 — Backend & Database
-Express server
-REST API structure
-PostgreSQL setup
-Prisma configuration
-Database schema
-Phase 3 — Authentication
-User registration
-Login
-Password hashing
-JWT authentication
-Protected routes
-Phase 4 — Hotel & Room Management
-Hotel APIs
-Room APIs
-Hotel details
-Room availability
-Phase 5 — Booking System
-Booking creation
-Availability validation
-Booking confirmation
-Booking history
-Booking cancellation
-Phase 6 — Reviews & Ratings
-Submit reviews
-Ratings
-Review management
-Phase 7 — Admin Dashboard
-Hotel management
-Room management
-User management
-Booking management
-Phase 8 — Testing & Deployment
-API testing
-Frontend testing
-Security improvements
-Production configuration
-Deployment
-👨‍💻 Development
-
-StayNest is being developed as a full-stack web application with a focus on clean architecture, maintainable code, relational database design, RESTful APIs, and a responsive user experience.
-
-📄 License
-
-This project is developed for educational and portfolio purposes.
+- User registration and login
+- Hotel discovery
+- Hotel search and filtering
+- Hotel details and room information
+- Room pricing and capacity
+- Date-based room availability
+- Hotel reservations
+- Booking history
+- Booking cancellation
+- Hotel ratings and reviews
+- User profile
+- AI-powered hotel assistant
 
 ---
 
-# 2. Check the final project structure
+## Hotel Manager Features
 
-Before Git, your important structure should now look like:
+Hotel managers have their own dedicated management portal.
+
+- Manager authentication
+- Manager dashboard
+- Hotel information management
+- Room creation
+- Room editing
+- Room deletion
+- Room inventory management
+- Booking management
+- Guest information
+- Review management
+- Revenue statistics
+- Hotel performance analytics
+
+Managers can only manage the hotel assigned to their account.
+
+---
+
+## Administrator Features
+
+The administrator has a separate administrative interface for platform-level management.
+
+- Administrator authentication
+- Platform dashboard
+- Hotel management
+- User management
+- Booking monitoring
+- Platform statistics
+
+---
+
+# 🤖 AI-Powered Hotel Assistant
+
+One of the main features of StayNest is the integrated AI hotel assistant.
+
+The assistant uses the **Groq API** with the:
+
+**`openai/gpt-oss-120b`**
+
+model.
+
+The AI does not invent hotel information. Instead, it can call backend tools that query the actual StayNest PostgreSQL database.
+
+### AI Architecture
 
 ```text
-hotel-booking-app/
-│
-├── .gitignore                 ✅
-├── README.md                  ✅
-│
-├── client/
-│   ├── src/
-│   ├── package.json
-│   └── ...
-│
-└── server/
-    ├── prisma/
-    │   └── schema.prisma
-    │
-    ├── src/
-    │   ├── controllers/
-    │   ├── middleware/
-    │   ├── routes/
-    │   ├── services/
-    │   ├── utils/
-    │   └── server.js
-    │
-    ├── .env                   🔒 ignored
-    ├── node_modules/          🔒 ignored
-    ├── package.json
-    ├── package-lock.json
-    ├── prisma7.config.ts
-    └── tsconfig.json
+User
+ │
+ ▼
+React Chatbot UI
+ │
+ ▼
+Express API
+ │
+ ▼
+Groq API
+ │
+ ▼
+AI decides which tool is required
+ │
+ ├── searchHotels
+ │
+ ├── getHotelDetails
+ │
+ ├── checkAvailability
+ │
+ └── searchAvailableRooms
+ │
+ ▼
+Prisma ORM
+ │
+ ▼
+PostgreSQL
+ │
+ ▼
+Real StayNest Data
+ │
+ ▼
+Groq
+ │
+ ▼
+Natural-language response
 ```
