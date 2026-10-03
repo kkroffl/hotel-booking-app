@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const AIChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,6 +13,13 @@ const AIChatbot = () => {
     },
   ]);
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages, loading]);
 
   const sendMessage = async () => {
     if (!message.trim() || loading) return;
@@ -77,10 +86,28 @@ const AIChatbot = () => {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-black text-white shadow-lg transition hover:scale-105"
+          className="fixed bottom-6 right-6 z-50 flex h-18 w-18 items-center justify-center rounded-full bg-black text-white shadow-lg transition hover:scale-105"
           aria-label="Open StayNest AI assistant"
         >
-          AI
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            className="h-7 w-7"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 3l1.2 4.8L18 9l-4.8 1.2L12 15l-1.2-4.8L6 9l4.8-1.2L12 3z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19 14l.6 2.4L22 17l-2.4.6L19 20l-.6-2.4L16 17l2.4-.6L19 14z"
+            />
+          </svg>
         </button>
       )}
 
@@ -118,18 +145,29 @@ const AIChatbot = () => {
                       : "bg-white text-gray-800 shadow-sm"
                   }`}
                 >
-                  {item.content}
+                  {item.role === "assistant" ? (
+                    <div className="prose prose-sm max-w-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {item.content}
+                      </ReactMarkdown>
+                    </div>
+                  ) : (
+                    item.content
+                  )}
                 </div>
               </div>
             ))}
 
             {loading && (
               <div className="flex justify-start">
-                <div className="rounded-2xl bg-white px-4 py-3 text-sm text-gray-500 shadow-sm">
-                  Thinking...
+                <div className="flex items-center gap-1 rounded-2xl bg-white px-4 py-3 shadow-sm">
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:-0.3s]" />
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:-0.15s]" />
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400" />
                 </div>
               </div>
             )}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Input */}
